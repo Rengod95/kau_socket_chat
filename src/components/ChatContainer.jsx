@@ -107,9 +107,7 @@ const ChatContainer = ({ children }) => {
 
   useEffect(() => {
     console.log(process.env.CHAT_PATH);
-    socketRef.current = io.connect(
-      "http://sss-env.eba-292phrg7.ap-northeast-2.elasticbeanstalk.com/"
-    );
+    socketRef.current = io.connect("https://networksocket.shop/");
 
     socketRef.current.on("chat", ({ name, content }) => {
       if (name !== user.name) {

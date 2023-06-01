@@ -90,10 +90,8 @@ export const CardRoot = styled.div`
   }
 `;
 
-export const GET_ALL_CARD_SERVER_URL =
-  "http://sss-env.eba-292phrg7.ap-northeast-2.elasticbeanstalk.com/board/all";
-export const CREATE_NEW_CARD_SERVER_URL =
-  "http://sss-env.eba-292phrg7.ap-northeast-2.elasticbeanstalk.com/board";
+export const GET_ALL_CARD_SERVER_URL = "https://networksocket.shop/board/all";
+export const CREATE_NEW_CARD_SERVER_URL = "https://networksocket.shop/board";
 export const BOARD_QUERY_KEY = "board";
 
 export const useCreateCardQuery = () => {
