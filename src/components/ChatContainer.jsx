@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
-import { io } from "socket.io-client";
 import { Button } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import { io } from "socket.io-client";
 import { userState } from "../states/user.state";
-import ChatBubble from "./ChatBubble";
 import { getRandomHex } from "../util/Number";
+import ChatBubble from "./ChatBubble";
+
 
 export const RootContainer = styled.section`
   position: relative;
@@ -93,7 +95,7 @@ export const ChatInput = styled.input`
 
 export const DEFAULT_CHAT_DATA = [
   {
-    name: "Admin",
+    name: "항공대학교",
     content: "채팅방에 입장하셨습니다.",
   },
 ];
@@ -104,23 +106,45 @@ const ChatContainer = ({ children }) => {
   const [user, setUser] = useRecoilState(userState);
   const inputRef = useRef(null);
   const socketRef = useRef(null);
+  const navigator = useNavigate();
+
 
   useEffect(() => {
     console.log(process.env.CHAT_PATH);
     socketRef.current = io.connect("https://networksocket.shop/");
-
+    const userEnterMessage = {
+      name: `${user.name}님`,
+      content: "입장하셨습니다.",
+    };
+  
+    // 서버로 입장 메시지 전송
+    socketRef.current.emit("chat", userEnterMessage);
+  
+    // 클라이언트에 입장 메시지 추가
+    setChat((prev) => [...prev, userEnterMessage]);
+  
     socketRef.current.on("chat", ({ name, content }) => {
       if (name !== user.name) {
-        setChat((prev) => {
-          return [...prev, { name, content }];
-        });
+        setChat((prev) => [...prev, { name, content }]);
       }
     });
-
+  
     return () => {
+      const userExitMessage = {
+        name: `${user.name}님`,
+        content: "퇴장하셨습니다.",
+      };
+  
+      // 서버로 퇴장 메시지 전송
+      socketRef.current.emit("chat", userExitMessage);
+  
+      // 클라이언트에 퇴장 메시지 추가
+      setChat((prev) => [...prev, userExitMessage]);
+  
       socketRef.current.disconnect();
     };
   }, []);
+  
 
   const handleChatSubmit = (e) => {
     e.preventDefault();
@@ -155,11 +179,25 @@ const ChatContainer = ({ children }) => {
       inputRef.current.value = "";
     }
   };
+  const handleLogout = () => {
+    // 클라이언트에서 로그아웃 버튼을 클릭할 때의 동작을 구현합니다.
+    // 예를 들어, 사용자 상태를 초기화하고 로그인 페이지로 이동하는 등의 작업을 수행할 수 있습니다.
+    setChat((prev) => {
+      return [
+        ...prev,
+        { name: `user.name`, content:"님이 나갔습니다." },
+      ];
+    });
 
+
+    setUser({name:''}); // 사용자 상태 초기화
+    navigator('/'); // 로그인 페이지로 이동
+  };
+  
   return (
     <RootContainer>
       <ChatHeader>
-        <HeaderTextWrapper>KAU-CHAT</HeaderTextWrapper>
+        <HeaderTextWrapper>KAU-CHAT  <Button id="leaveButton" onClick={handleLogout}>나가기</Button></HeaderTextWrapper>
       </ChatHeader>
       <ChatBody>
         {chat.map((data) => {
@@ -174,9 +212,11 @@ const ChatContainer = ({ children }) => {
       </ChatBody>
       <ChatFooter>
         <ChatInputContainer>
+          
           <ChatInputWrapper onKeyDown={handleEnter}>
             <ChatInput multiline maxRows={5} ref={inputRef}></ChatInput>
             <Button onClick={handleChatSubmit}>전송</Button>
+            
           </ChatInputWrapper>
         </ChatInputContainer>
       </ChatFooter>

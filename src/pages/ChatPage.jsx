@@ -1,16 +1,17 @@
+import styled from "@emotion/styled";
+import { Button } from "@mui/material";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+
+import { queryClient } from "../App";
 import ChatContainer, {
   ChatInput,
   ChatInputContainer,
   ChatInputWrapper,
 } from "../components/ChatContainer";
-import styled from "@emotion/styled";
-import { Button } from "@mui/material";
-import { useRecoilState } from "recoil";
 import { userState } from "../states/user.state";
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryClient } from "../App";
 
 export const ChatPageContainer = styled.div`
   display: flex;
@@ -148,10 +149,12 @@ const ChatPage = () => {
       createCard({ title: user.name, content: inputRef.current.value });
     }
   };
+  
   return (
     <ChatPageContainer>
+      
       <ChatContainer></ChatContainer>
-
+      
       <CardContainer>
         <CardHeaderWrapper>
           <h1>방명록</h1>
